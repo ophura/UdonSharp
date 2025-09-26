@@ -352,7 +352,7 @@ namespace UdonSharp.Compiler.Binder
         {
             Type type = GetTypeSymbol(node.Type).UdonType.SystemType;
 
-            int size = 1; // assume boolean at first, otherwise; let the marshaller report the size :D
+            int size = sizeof(bool); // assume boolean at first, otherwise; let the marshaller report the size :D
 
             if (type.IsEnum) // this adds support for enumerated types > ~ <
             {
