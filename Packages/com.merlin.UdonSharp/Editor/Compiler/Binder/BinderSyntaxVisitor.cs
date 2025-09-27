@@ -351,12 +351,16 @@ namespace UdonSharp.Compiler.Binder
         public override BoundNode VisitSizeOfExpression(SizeOfExpressionSyntax node)
         {
             Type type = GetTypeSymbol(node.Type).UdonType.SystemType;
-            
-            int size = Marshal.SizeOf(type);
-            
-            if (type == typeof(bool))
-                size = 1; // C# sizeof(bool) is 1 byte but Marshal.SizeOf is 4 bytes for bool :(
-            
+
+            if (type.IsEnum) // this adds support for enumerated types > ~ <
+            {
+                type = type.GetEnumUnderlyingType();
+            }
+
+            // C# sizeof(bool) is 1 byte but Marshal.SizeOf is 4 bytes for bool :(
+            // assume boolean at first, otherwise; let the marshaller report the size :D
+            int size = type == typeof(bool) ? sizeof(bool) : Marshal.SizeOf(type);
+
             return new BoundConstantExpression(size, Context.GetTypeSymbol(SpecialType.System_Int32));
         }
         
